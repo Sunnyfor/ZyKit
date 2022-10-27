@@ -43,7 +43,7 @@ afterEvaluate {
             release(MavenPublication) {
                 from components.release
                 groupId = 'com.github.Sunnyfor'
-                artifactId = 'zyhttp'
+                artifactId = 'zykit'
                 version = '1.0.0'
             }
         }
