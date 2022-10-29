@@ -104,4 +104,18 @@ object StringUtil {
         val simpleDateFormat = SimpleDateFormat(pattern, Locale.getDefault())
         return simpleDateFormat.format(date)
     }
+
+    fun byteArrToHex(vararg bytes: Byte): String {
+        val hexArray = arrayOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F')
+        val hexChars = CharArray(bytes.size * 2)
+        for (j in bytes.indices) {
+            val v: Int = bytes[j].toInt() and 0xFF
+            hexChars[j * 2] = hexArray[v ushr 4]
+            hexChars[j * 2 + 1] = hexArray[v and 0x0F]
+        }
+        return String(hexChars)
+    }
+
+
+
 }
