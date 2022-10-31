@@ -33,7 +33,7 @@ android {
 
 dependencies {
     api project.ext.dependencies.gson
-    implementation project.ext.dependencies.core_ktx
+    implementation project.ext.dependencies.coreKtx
     implementation project.ext.dependencies.appcompat
 }
 
@@ -44,7 +44,7 @@ afterEvaluate {
             release(MavenPublication) {
                 from components.release
                 groupId = 'com.github.Sunnyfor'
-                artifactId = 'zykit'
+                artifactId = 'Zykit'
                 version = '1.0.0'
             }
         }

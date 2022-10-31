@@ -11,11 +11,6 @@ object ZyKit {
 
     private lateinit var instance: Application
 
-    /**
-     * 内存卡缓存路径
-     */
-    private var tempPath = ""
-
     fun init(application: Application) {
         instance = application
     }
@@ -27,16 +22,5 @@ object ZyKit {
      * provider权限
      */
     var authorities = "com.sunny.zy.provider"
-
-
-    /**
-     * 获取缓存目录
-     */
-    fun getCatchPath(): String {
-        if (tempPath.isEmpty()) {
-            tempPath = getContext().getExternalFilesDir("temp")?.path ?: ""
-        }
-        return tempPath
-    }
 
 }

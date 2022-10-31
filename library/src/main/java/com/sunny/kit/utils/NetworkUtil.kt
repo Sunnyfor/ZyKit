@@ -6,7 +6,6 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import com.sunny.kit.ZyKit
-import com.sunny.kit.utils.LogUtil
 
 /**
  * 网络请求判断

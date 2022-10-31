@@ -17,7 +17,7 @@ object FileUtil {
     /**
      * 获取换成你文件路径
      */
-    private fun getCacheDir(pathName: String = "temp"): String {
+    fun getCacheDir(pathName: String = "temp"): String {
         val temp = ZyKit.getContext().getExternalFilesDir(pathName)
         var path = ""
         temp?.let {

@@ -3,7 +3,6 @@ package com.sunny.kit.utils
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import com.sunny.kit.utils.ToastUtil
 
 /**
  * Desc 手机号校验工具类
