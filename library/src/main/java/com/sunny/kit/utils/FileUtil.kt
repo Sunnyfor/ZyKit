@@ -17,7 +17,7 @@ object FileUtil {
     /**
      * 获取换成你文件路径
      */
-    fun getCacheDir(pathName: String = "temp"): String {
+    fun getExternalDir(pathName: String = "temp"): String {
         val temp = ZyKit.getContext().getExternalFilesDir(pathName)
         var path = ""
         temp?.let {
@@ -34,7 +34,7 @@ object FileUtil {
      * 根据文件名获取文件
      */
     fun getFile(name: String): File {
-        return File(getCacheDir(), name)
+        return File(getExternalDir(), name)
     }
 
 
@@ -49,33 +49,12 @@ object FileUtil {
         )
     }
 
-
-    fun cropResultGetUri(uri: Uri?, file: File): Uri? {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && uri != null) {
-            ZyKit.getContext().contentResolver.openInputStream(uri)?.use {
-                if (file.exists()) {
-                    file.delete()
-                }
-                file.createNewFile()
-                file.writeBytes(it.readBytes())
-                ZyKit.getContext().contentResolver.delete(uri, null)
-                return FileProvider.getUriForFile(
-                    ZyKit.getContext(),
-                    ZyKit.authorities,
-                    file
-                )
-            }
-        }
-        return null
-    }
-
-
     /**
      * 获取目录缓存大小
      */
     fun getCacheSize(): Long {
         var size = 0L
-        size += getFolderSize(File(getCacheDir()))
+        size += getFolderSize(File(getExternalDir()))
         return size
     }
 
@@ -136,7 +115,7 @@ object FileUtil {
      * 删除所有缓存文件
      */
     fun deleteAllFile() {
-        File(getCacheDir()).listFiles()?.forEach {
+        File(getExternalDir()).listFiles()?.forEach {
             deleteFolderFile(it.path)
         }
     }
@@ -151,24 +130,5 @@ object FileUtil {
         } else {
             file.delete()
         }
-    }
-
-    /**
-     * 从一个文件路径得到URI
-     */
-    fun getUriFromPath(path: String): Uri? {
-        try {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                FileProvider.getUriForFile(
-                    ZyKit.getContext(), ZyKit.authorities, File(path)
-                )
-            } else {
-                Uri.fromFile(File(path))
-            }
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return null
     }
 }

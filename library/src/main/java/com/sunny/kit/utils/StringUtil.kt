@@ -116,6 +116,4 @@ object StringUtil {
         return String(hexChars)
     }
 
-
-
 }
