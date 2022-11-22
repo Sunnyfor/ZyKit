@@ -11,11 +11,6 @@ object ZyKit {
 
     private lateinit var instance: Application
 
-    /**
-     * 两次点击事件间隔，单位毫秒
-     */
-    var clickInterval = 500L
-
     fun init(application: Application) {
         instance = application
     }
