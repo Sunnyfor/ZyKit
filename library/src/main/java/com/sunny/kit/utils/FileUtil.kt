@@ -1,10 +1,11 @@
 package com.sunny.kit.utils
 
+import android.content.ContentUris
 import android.content.ContentValues
 import android.net.Uri
-import android.os.Build
+import android.os.Environment
+import android.provider.DocumentsContract
 import android.provider.MediaStore
-import androidx.core.content.FileProvider
 import com.sunny.kit.ZyKit
 import java.io.File
 import java.text.DecimalFormat
@@ -54,7 +55,7 @@ object FileUtil {
      */
     fun getCacheSize(): Long {
         var size = 0L
-        size += getFolderSize(File(getExternalDir()))
+        size += getFileSize(File(getExternalDir()))
         return size
     }
 
@@ -87,21 +88,17 @@ object FileUtil {
      * @return size
      * @throws Exception
      */
-    private fun getFolderSize(file: File?): Long {
+    fun getFileSize(file: File): Long {
         var size: Long = 0
-
-        if (file == null) {
-            return size
-        }
         try {
-            file.listFiles()?.let {
-                for (aFileList in it) {
-                    size += if (aFileList.isDirectory) {
-                        getFolderSize(aFileList)
-                    } else {
-                        aFileList.length()
+            if (file.isDirectory) {
+                file.listFiles()?.let {
+                    for (itemFile in it) {
+                        size += getFileSize(itemFile)
                     }
                 }
+            } else {
+                size = file.length()
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -112,23 +109,119 @@ object FileUtil {
 
 
     /**
-     * 删除所有缓存文件
+     * 删除文件夹
      */
-    fun deleteAllFile() {
-        File(getExternalDir()).listFiles()?.forEach {
-            deleteFolderFile(it.path)
-        }
+    fun deleteFile(filePath: String) {
+        val file = File(filePath)
+        deleteFile(file)
     }
 
-    private fun deleteFolderFile(filePath: String) {
-        val file = File(filePath)
+    fun deleteFile(file: File) {
         if (file.isDirectory) {
             val files = file.listFiles()
             files?.forEach {
-                deleteFolderFile(it.absolutePath)
+                deleteFile(it.absolutePath)
             }
         } else {
             file.delete()
         }
     }
+
+
+    /**
+     * 通过URI获取文件路径
+     */
+    private fun getFilePathFromUri(uri: Uri): String {
+        var filePath: String? = null
+        val docId = if (DocumentsContract.isDocumentUri(ZyKit.getContext(), uri)) {
+            DocumentsContract.getDocumentId(uri)
+        } else {
+            DocumentsContract.getTreeDocumentId(uri)
+        }
+
+        if (docId.isEmpty()) {
+            ToastUtil.show("选择失败，当前设备不支持！")
+            return ""
+        }
+
+        when (uri.authority) {
+            "com.android.externalstorage.documents" -> {
+                val split = docId.split(":")
+                if (split.size > 1) {
+                    val storageType = split[0]
+                    filePath = if ("primary".equals(storageType, true)) {
+                        "${Environment.getExternalStorageDirectory()}/" + split[1]
+                    } else {
+                        "${System.getenv("ANDROID_STORAGE")}/${split[0]}/${split[1]}"
+                    }
+                }
+            }
+
+            "com.android.providers.downloads.documents" -> {
+                filePath = if (docId.contains("raw")) {
+                    val split = docId.split(":")
+                    split[1]
+                } else {
+                    val contentUri = ContentUris.withAppendedId(
+                        Uri.parse("content://downloads/public_downloads"),
+                        docId.toLong()
+                    )
+                    queryFilePath(contentUri)
+                }
+            }
+
+            "com.android.providers.media.documents" -> {
+                val split = docId.split(":")
+                val type = split[0]
+                val contentUri: Uri?
+
+                when (type) {
+                    "image" -> {
+                        contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                    }
+
+                    "video" -> {
+                        contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                    }
+
+                    "audio" -> {
+                        contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                    }
+
+                    else -> {
+                        contentUri = MediaStore.Files.getContentUri("external")
+                    }
+                }
+                val selection = MediaStore.Images.Media._ID + "=?"
+                val selectionArgs = arrayOf(split[1])
+                contentUri?.let {
+                    filePath = queryFilePath(it, selection, selectionArgs)
+                }
+            }
+
+            else -> {
+                if ("content".equals(uri.scheme, true)) {
+                    filePath = queryFilePath(uri)
+                } else if ("content".equals(uri.scheme, true)) {
+                    filePath = uri.path
+                }
+            }
+        }
+        return filePath ?: ""
+    }
+
+
+    fun queryFilePath(uri: Uri, selection: String? = null, selectionArgs: Array<String>? = null): String? {
+        val projection = arrayOf(MediaStore.Files.FileColumns.DATA)
+        val cursor = ZyKit.getContext().contentResolver.query(uri, projection, selection, selectionArgs, null)
+        cursor?.use {
+            val columnIndex = it.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)
+            if (it.moveToFirst()) {
+                return it.getString(columnIndex)
+            }
+        }
+        return null
+    }
+
+
 }
