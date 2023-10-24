@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
     id 'maven-publish'
 }
 
@@ -33,6 +34,11 @@ android {
 
 dependencies {
     api project.ext.dependencies.gson
+    api project.ext.dependencies.coroutines
+    api project.ext.dependencies.glide
+    kapt project.ext.dependencies.glideCompiler
+
+    implementation "com.github.Sunnyfor:ZyHttp:1.0.6"
     implementation project.ext.dependencies.coreKtx
     implementation project.ext.dependencies.appcompat
 }

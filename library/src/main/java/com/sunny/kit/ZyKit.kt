@@ -15,6 +15,12 @@ object ZyKit {
         instance = application
     }
 
+    val authorities: String
+        get() {
+            return "${instance.packageName}.provider"
+        }
+
+
     fun getContext() = instance
 
 }

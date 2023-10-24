@@ -1,6 +1,6 @@
 package com.sunny.kit.utils
 
-import android.util.Log
+import android.annotation.SuppressLint
 import android.util.TypedValue
 import android.view.View
 import com.sunny.kit.ZyKit
@@ -120,26 +120,20 @@ object DensityUtil {
     }
 
 
+    @SuppressLint("DiscouragedApi", "InternalInsetResource")
     fun getStatusBarHeight(): Int {
         val resources = ZyKit.getContext().resources
         val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
         if (resourceId > 0) {
-            val height = resources.getDimensionPixelSize(resourceId)
-            Log.v("dbw", "Status height:$height")
-            return height
+            return resources.getDimensionPixelSize(resourceId)
         }
-        return 0
+        return (getToolBarHeight() / 1.55).toInt()
     }
 
     fun getToolBarHeight(): Int {
         val tv = TypedValue()
-        return if (ZyKit.getContext().theme.resolveAttribute(
-                android.R.attr.actionBarSize, tv, true
-            )
-        ) {
-            TypedValue.complexToDimensionPixelSize(
-                tv.data, ZyKit.getContext().resources.displayMetrics
-            )
+        return if (ZyKit.getContext().theme.resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            TypedValue.complexToDimensionPixelSize(tv.data, ZyKit.getContext().resources.displayMetrics)
         } else 0
     }
 

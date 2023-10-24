@@ -7,6 +7,8 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.GravityInt
+import androidx.annotation.StringRes
 import com.sunny.kit.BuildConfig
 import com.sunny.kit.ZyKit
 
@@ -31,6 +33,7 @@ object ToastUtil {
                 val duration = it.data.getInt("duration")
                 show(content, duration)
             }
+
             1 -> {
                 toast?.cancel()
                 toast = null
@@ -84,11 +87,39 @@ object ToastUtil {
         show(content, duration, 0)
     }
 
-    /**
+       /**
      * Toast底部显示
+     * @param content 打印内容
      */
     fun show(content: String?) {
         show(content, Toast.LENGTH_SHORT)
+    }
+
+       /**
+     * Toast底部显示
+     * @param contentRes 打印内容资源ID
+     * @param duration 打印长短
+     */
+    fun show(@StringRes contentRes: Int, duration: Int, @GravityInt gravity: Int) {
+        show(ZyKit.getContext().getString(contentRes), duration, gravity)
+    }
+
+       /**
+     * Toast底部显示
+     * @param contentRes 打印内容资源ID
+     * @param duration 打印长短
+     */
+    fun show(@StringRes contentRes: Int, duration: Int) {
+        show(contentRes, duration, 0)
+    }
+
+       /**
+     * Toast底部显示
+     * @param contentRes 打印内容资源ID
+     * @param duration 打印长短
+     */
+    fun show(@StringRes contentRes: Int) {
+        show(contentRes, Toast.LENGTH_SHORT, 0)
     }
 
     /**
