@@ -5,7 +5,7 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import com.sunny.kit.ZyKit
+import com.sunny.kit.utils.api.ZyKit
 
 /**
  * 网络请求判断

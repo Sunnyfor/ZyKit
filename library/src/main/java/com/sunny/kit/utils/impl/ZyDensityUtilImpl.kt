@@ -1,9 +1,10 @@
-package com.sunny.kit.utils
+package com.sunny.kit.utils.impl
 
 import android.annotation.SuppressLint
 import android.util.TypedValue
 import android.view.View
-import com.sunny.kit.ZyKit
+import com.sunny.kit.utils.api.ZyKit
+import com.sunny.kit.utils.api.common.ZyDensityUtil
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -14,34 +15,49 @@ import kotlin.math.sqrt
  * Mail sunnyfor98@gmail.com
  * Date 2020/2/13
  */
-object DensityUtil {
+internal class ZyDensityUtilImpl : ZyDensityUtil {
 
     /**
-     * 根据手机的分辨率从 px(像素) 的单位 转成为 dp
+     * 将 px 像素转换为 dp
      */
-    fun px2dp(px: Float): Int {
+    override fun px2dp(px: Float): Int {
         return (px2dpFloat(px) + 0.5f).toInt()
     }
 
-    fun dp2px(dp: Float): Int {
+    /**
+     * 将 dp 转换为像素（px）
+     */
+    override fun dp2px(dp: Float): Int {
         return (dp2pxFloat(dp) + 0.5f).toInt()
     }
 
-    fun sp2px(spValue: Float): Int {
+    /**
+     * 将 sp 转换为像素（px）
+     */
+    override fun sp2px(spValue: Float): Int {
         return (sp2pxFloat(spValue) + 0.5f).toInt()
     }
 
-    fun px2dpFloat(px: Float): Float {
+    /**
+     * 将 px 像素转换为 dp
+     */
+    override fun px2dpFloat(px: Float): Float {
         val density = ZyKit.getContext().resources.displayMetrics.density
         return px / density
     }
 
-    fun dp2pxFloat(dp: Float): Float {
+    /**
+     * 将 dp 转换为像素（px）
+     */
+    override fun dp2pxFloat(dp: Float): Float {
         val density = ZyKit.getContext().resources.displayMetrics.density
         return dp * density
     }
 
-    fun sp2pxFloat(sp: Float): Float {
+    /**
+     * 将 sp 转换为像素（px）
+     */
+    override fun sp2pxFloat(sp: Float): Float {
         val density = ZyKit.getContext().resources.displayMetrics.scaledDensity
         return sp * density
     }
@@ -49,24 +65,21 @@ object DensityUtil {
     /**
      * 获取手机屏幕的高度
      */
-    fun screenHeight(): Int {
+    override fun screenHeight(): Int {
         return ZyKit.getContext().resources.displayMetrics.heightPixels
     }
 
     /**
      * 获取手机屏幕的宽度
      */
-    fun screenWidth(): Int {
+    override fun screenWidth(): Int {
         return ZyKit.getContext().resources.displayMetrics.widthPixels
     }
 
     /**
      * 获取控件的宽度
-     *
-     * @param view 要获取宽度的控件
-     * @return 控件的宽度
      */
-    fun viewWidth(view: View): Int {
+    override fun viewWidth(view: View): Int {
         val w = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
         val h = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
         view.measure(w, h)
@@ -75,11 +88,8 @@ object DensityUtil {
 
     /**
      * 获取控件的高度
-     *
-     * @param view 要获取高度的控件
-     * @return 控件的高度
      */
-    fun viewHeight(view: View): Int {
+    override fun viewHeight(view: View): Int {
         val w = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
         val h = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
         view.measure(w, h)
@@ -88,11 +98,8 @@ object DensityUtil {
 
     /**
      * 获取控件在窗体中的位置
-     *
-     * @param view 要获取位置的控件
-     * @return 控件位置的数组
      */
-    fun getViewLocationInWindow(view: View): IntArray {
+    override fun getViewLocationInWindow(view: View): IntArray {
         val location = IntArray(2)
         view.getLocationInWindow(location)
         return location
@@ -100,11 +107,8 @@ object DensityUtil {
 
     /**
      * 获取控件在整个屏幕中的 位置
-     *
-     * @param view 要获取位置的控件
-     * @return 控件位置的数组
      */
-    fun getViewLocationInScreen(view: View): IntArray {
+    override fun getViewLocationInScreen(view: View): IntArray {
         val location = IntArray(2)
         view.getLocationOnScreen(location)
         return location
@@ -113,15 +117,17 @@ object DensityUtil {
     /**
      * 获取设备的尺寸
      */
-    fun getDeviceSize(): Double {
+    override fun getDeviceSize(): Double {
         val dm = ZyKit.getContext().resources.displayMetrics
         val sqrt = sqrt(dm.widthPixels.toDouble().pow(2.0) + dm.heightPixels.toDouble().pow(2.0))
         return sqrt / (160 * dm.density)
     }
 
-
+    /**
+     * 获取设备状态栏的高度
+     */
     @SuppressLint("DiscouragedApi", "InternalInsetResource")
-    fun getStatusBarHeight(): Int {
+    override fun getStatusBarHeight(): Int {
         val resources = ZyKit.getContext().resources
         val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
         if (resourceId > 0) {
@@ -130,7 +136,10 @@ object DensityUtil {
         return (getToolBarHeight() / 1.55).toInt()
     }
 
-    fun getToolBarHeight(): Int {
+    /**
+     * 获取标题栏高度
+     */
+    override fun getToolBarHeight(): Int {
         val tv = TypedValue()
         return if (ZyKit.getContext().theme.resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
             TypedValue.complexToDimensionPixelSize(tv.data, ZyKit.getContext().resources.displayMetrics)

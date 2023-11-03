@@ -8,7 +8,7 @@ import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import androidx.core.content.FileProvider
-import com.sunny.kit.ZyKit
+import com.sunny.kit.utils.api.ZyKit
 import java.io.File
 
 @Suppress("MemberVisibilityCanBePrivate")

@@ -1,5 +1,6 @@
-package com.sunny.kit.utils
+package com.sunny.kit.utils.impl
 
+import com.sunny.kit.utils.api.common.ZyEncryptionUtil
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
@@ -9,9 +10,9 @@ import java.security.NoSuchAlgorithmException
  * Mail sunnyfor98@gmail.com
  * Date 2018/8/3.
  */
-object DigestUtil {
+internal class ZyEncryptionUtilImpl : ZyEncryptionUtil {
 
-    fun md5(message: String): String {
+    override fun md5(message: String): String {
         try {
             //获取md5加密对象
             val instance: MessageDigest = MessageDigest.getInstance("MD5")
@@ -30,7 +31,7 @@ object DigestUtil {
      * @param strSrc 明文
      * @return 加密之后的密文
      */
-    fun sha1(strSrc: String): String {
+    override fun sha1(strSrc: String): String {
         return try {
             val md = MessageDigest.getInstance("SHA-1")// 将此换成SHA-1、SHA-512、SHA-384等参数
             val bt = strSrc.toByteArray()
@@ -47,7 +48,7 @@ object DigestUtil {
      * @param byteArray 数据源
      * @return 16进制字符串
      */
-    private fun bytes2Hex(byteArray: ByteArray): String {
+    override fun bytes2Hex(byteArray: ByteArray): String {
         val sb = StringBuffer()
         for (b in byteArray) {
             //获取低八位有效值

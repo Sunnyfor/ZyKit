@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.text.TextUtils
 import com.google.gson.Gson
-import com.sunny.kit.ZyKit
+import com.sunny.kit.utils.api.ZyKit
 import java.lang.reflect.Type
 
 /**

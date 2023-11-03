@@ -1,20 +1,23 @@
-package com.sunny.kit.utils
+package com.sunny.kit.utils.impl
 
-import com.sunny.kit.ZyKit
+import com.sunny.kit.utils.api.ZyKit
+import com.sunny.kit.utils.api.common.ZyFileUtil
 import java.io.File
 import java.text.DecimalFormat
 
 /**
  * 文件操作相关工具类
  */
-@Suppress("MemberVisibilityCanBePrivate")
-object FileUtil {
+
+internal class ZyFileUtilImpl : ZyFileUtil {
+
+    var rootPath = "temp"
 
     /**
-     * 获取换成你文件路径
+     * 获取私有目录文件路径
      */
-    fun getExternalFilesDir(pathName: String = "temp"): String {
-        val temp = ZyKit.getContext().getExternalFilesDir(pathName)
+    override fun getExternalFilesDir(): String {
+        val temp = ZyKit.getContext().getExternalFilesDir(rootPath)
         var path = ""
         temp?.let {
             if (!it.exists()) {
@@ -29,15 +32,17 @@ object FileUtil {
     /**
      * 根据文件名获取文件
      */
-    fun getExternalFile(name: String): File {
-        return File(getExternalFilesDir(), name)
+    override fun getExternalFile(name: String, isMake: Boolean): File {
+        return File(getExternalFilesDir(), name).apply {
+            if (isMake) createNewFile()
+        }
     }
 
 
     /**
      * 获取目录缓存大小
      */
-    fun getExternalFileSize(): Long {
+    override fun getExternalFileSize(): Long {
         var size = 0L
         size += getFileSize(File(getExternalFilesDir()))
         return size
@@ -50,7 +55,7 @@ object FileUtil {
      * @param fileSize 文件长度
      * @return 转换后的文件大小
      */
-    fun formatFileSize(fileSize: Long): String {
+    override fun formatFileSize(fileSize: Long): String {
         val df = DecimalFormat("#.00")
         val wrongSize = "0B"
         if (fileSize == 0L) {
@@ -70,7 +75,7 @@ object FileUtil {
      * @param file 文件
      * @return 文件大小
      */
-    fun getFileSize(file: File): Long {
+    override fun getFileSize(file: File): Long {
         var size: Long = 0
         try {
             if (file.isDirectory) {
@@ -94,7 +99,7 @@ object FileUtil {
      * 删除文件
      * @param filePath 文件路径
      */
-    fun deleteFile(filePath: String) {
+    override fun deleteFile(filePath: String) {
         val file = File(filePath)
         deleteFile(file)
     }
@@ -103,7 +108,7 @@ object FileUtil {
      * 删除文件
      * @param file 文件
      */
-    fun deleteFile(file: File) {
+    override fun deleteFile(file: File) {
         if (file.isDirectory) {
             val files = file.listFiles()
             files?.forEach {
