@@ -1,7 +1,7 @@
 package com.sunny.kit.utils.api.common
 
 import android.util.ArrayMap
-import com.sunny.kit.utils.LogUtil
+import com.sunny.kit.utils.api.ZyKit
 
 open class DataStore {
 
@@ -17,7 +17,7 @@ open class DataStore {
         if (value is T) {
             return value
         }
-        LogUtil.i("${value?.javaClass?.name} 不能被转换为 ${T::class.java.name}")
+        ZyKit.log.i("${value?.javaClass?.name} 不能被转换为 ${T::class.java.name}")
         return null
     }
 

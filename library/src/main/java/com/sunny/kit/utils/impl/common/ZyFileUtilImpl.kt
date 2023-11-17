@@ -1,4 +1,4 @@
-package com.sunny.kit.utils.impl
+package com.sunny.kit.utils.impl.common
 
 import com.sunny.kit.utils.api.ZyKit
 import com.sunny.kit.utils.api.common.ZyFileUtil

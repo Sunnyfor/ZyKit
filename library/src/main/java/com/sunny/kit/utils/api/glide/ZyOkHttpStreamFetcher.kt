@@ -7,7 +7,7 @@ import com.bumptech.glide.load.data.DataFetcher
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.util.ContentLengthInputStream
 import com.bumptech.glide.util.Preconditions
-import com.sunny.kit.utils.LogUtil
+import com.sunny.kit.utils.api.ZyKit
 import okhttp3.Call
 import okhttp3.Request
 import okhttp3.Response
@@ -42,7 +42,7 @@ class ZyOkHttpStreamFetcher(var client: Call.Factory, var url: GlideUrl) : DataF
     }
 
     override fun onFailure(call: Call, e: IOException) {
-        LogUtil.i("OkHttp failed to obtain result:${e.message}")
+        ZyKit.log.i("OkHttp failed to obtain result:${e.message}")
         callback?.onLoadFailed(e)
     }
 

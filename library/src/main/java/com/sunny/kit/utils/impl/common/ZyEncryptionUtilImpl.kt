@@ -1,4 +1,4 @@
-package com.sunny.kit.utils.impl
+package com.sunny.kit.utils.impl.common
 
 import com.sunny.kit.utils.api.common.ZyEncryptionUtil
 import java.security.MessageDigest

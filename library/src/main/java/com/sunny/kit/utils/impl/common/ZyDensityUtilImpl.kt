@@ -1,4 +1,4 @@
-package com.sunny.kit.utils.impl
+package com.sunny.kit.utils.impl.common
 
 import android.annotation.SuppressLint
 import android.util.TypedValue

@@ -1,4 +1,4 @@
-package com.sunny.kit.utils
+package com.sunny.kit.utils.impl.common
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -6,33 +6,39 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import com.sunny.kit.utils.api.ZyKit
+import com.sunny.kit.utils.api.common.ZyNetworkUtil
 
 /**
  * 网络请求判断
  */
-class NetworkUtil(private var callBack: (isAvailable: Boolean, netType: NetType) -> Unit) : ConnectivityManager.NetworkCallback() {
+internal class ZyNetworkUtilImpl : ConnectivityManager.NetworkCallback(), ZyNetworkUtil {
 
-    private var isAvailable = false
+    private var onNetWorkChangerListener: ZyNetworkUtil.OnNetWorkChangerListener? = null
 
-    private var netType = NetType.OTHER
+    override var isAvailable = false
+
+    override var netType = ZyNetworkUtil.NetType.NONE
+
+    override fun setOnNetWorkChangerListener(onNetWorkChangerListener: ZyNetworkUtil.OnNetWorkChangerListener?) {
+        this.onNetWorkChangerListener = onNetWorkChangerListener
+    }
+
 
     private val manager by lazy {
         ZyKit.getContext()
             .getSystemService(Context.CONNECTIVITY_SERVICE)
     }
 
-    fun register() {
+    init {
         if (manager is ConnectivityManager) {
-            (manager as ConnectivityManager).unregisterNetworkCallback(this)
-            (manager as ConnectivityManager).registerNetworkCallback(
-                NetworkRequest.Builder().build(),
-                this
-            )
+            (manager as ConnectivityManager).registerNetworkCallback(NetworkRequest.Builder().build(), this)
+            ZyKit.log.i("开始监听网络状态！")
         } else {
-            callBack.invoke(isAvailable, netType)
-            LogUtil.i("没有获取到ConnectivityManager！")
+            onNetWorkChangerListener?.onNetWorkChanger(isAvailable, netType)
+            ZyKit.log.i("没有获取到ConnectivityManager！")
         }
     }
+
 
     override fun onAvailable(network: Network) {
         isAvailable = true
@@ -41,7 +47,7 @@ class NetworkUtil(private var callBack: (isAvailable: Boolean, netType: NetType)
                 netType = getNetType(it)
             }
         }
-        callBack.invoke(isAvailable, netType)
+        onNetWorkChangerListener?.onNetWorkChanger(isAvailable, netType)
     }
 
     override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
@@ -55,27 +61,16 @@ class NetworkUtil(private var callBack: (isAvailable: Boolean, netType: NetType)
         (manager as ConnectivityManager).getNetworkCapabilities(network)?.let {
             netType = getNetType(it)
         }
-        callBack.invoke(isAvailable, netType)
+        onNetWorkChangerListener?.onNetWorkChanger(isAvailable, netType)
     }
 
-    private fun getNetType(networkCapabilities: NetworkCapabilities): NetType {
+    private fun getNetType(networkCapabilities: NetworkCapabilities): ZyNetworkUtil.NetType {
         return if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-            NetType.WIFI
+            ZyNetworkUtil.NetType.WIFI
         } else if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-            NetType.WAP
+            ZyNetworkUtil.NetType.WAP
         } else {
-            NetType.OTHER
+            ZyNetworkUtil.NetType.OTHER
         }
-    }
-
-
-    fun unRegister() {
-        if (manager is ConnectivityManager) {
-            (manager as ConnectivityManager).unregisterNetworkCallback(this)
-        }
-    }
-
-    enum class NetType {
-        WIFI, WAP, OTHER
     }
 }
