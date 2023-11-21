@@ -10,7 +10,7 @@ import android.widget.Toast
 import androidx.annotation.GravityInt
 import androidx.annotation.StringRes
 import com.sunny.kit.BuildConfig
-import com.sunny.kit.utils.api.ZyKit
+import com.sunny.kit.utils.application.ZyKit
 
 /**
  * Desc 单例Toast

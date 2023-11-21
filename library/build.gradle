@@ -38,7 +38,7 @@ dependencies {
     api project.ext.dependencies.glide
     kapt project.ext.dependencies.glideCompiler
 
-    implementation "com.github.Sunnyfor:ZyHttp:1.0.6"
+    implementation project.ext.dependencies.okhttp
     implementation project.ext.dependencies.coreKtx
     implementation project.ext.dependencies.appcompat
 }
