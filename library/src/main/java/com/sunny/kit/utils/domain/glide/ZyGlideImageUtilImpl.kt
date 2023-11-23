@@ -3,12 +3,8 @@ package com.sunny.kit.utils.domain.glide
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
-import com.bumptech.glide.GlideBuilder
-import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.resource.gif.GifDrawable
-import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.sunny.kit.utils.application.glide.GlideApp
@@ -24,8 +20,6 @@ internal class ZyGlideImageUtilImpl : ZyImageUtil() {
     }
 
     private fun getLoadImageRequest(imgView: ImageView, imgPath: Any, placeholder: Int): GlideRequest<Drawable> {
-        val s = RequestOptions()
-
         return GlideApp.with(imgView.context).load(imgPath).placeholder(getPlaceholder(placeholder)).dontAnimate()
     }
 

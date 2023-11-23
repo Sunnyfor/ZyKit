@@ -14,6 +14,7 @@ import com.sunny.kit.utils.application.common.ZyNetworkUtil
 import com.sunny.kit.utils.application.common.ZyPhoneUtil
 import com.sunny.kit.utils.application.common.ZySpUtil
 import com.sunny.kit.utils.application.common.ZyStringUtl
+import com.sunny.kit.utils.application.common.ZyToastUtil
 import com.sunny.kit.utils.application.common.ZyUriUtil
 import com.sunny.kit.utils.application.glide.ZyImageUtil
 import com.sunny.kit.utils.domain.common.ZyDateUtilImpl
@@ -25,9 +26,9 @@ import com.sunny.kit.utils.domain.common.ZyMoneyUtilImpl
 import com.sunny.kit.utils.domain.common.ZyNetworkUtilImpl
 import com.sunny.kit.utils.domain.common.ZyPhoneUtilImpl
 import com.sunny.kit.utils.domain.common.ZyStringUtlImpl
+import com.sunny.kit.utils.domain.common.ZyToastUtilImpl
 import com.sunny.kit.utils.domain.common.ZyUriUtilImpl
 import com.sunny.kit.utils.domain.glide.ZyGlideImageUtilImpl
-import okhttp3.OkHttpClient
 
 /**
  * Desc 工具类初始化
@@ -38,7 +39,6 @@ import okhttp3.OkHttpClient
 object ZyKit {
 
     private lateinit var instance: Application
-
 
 
     /**
@@ -137,6 +137,13 @@ object ZyKit {
      */
     val uri: ZyUriUtil by lazy {
         ZyUriUtilImpl()
+    }
+
+    /**
+     * 吐司工具
+     */
+    val toast: ZyToastUtil by lazy {
+        ZyToastUtilImpl()
     }
 
     /**

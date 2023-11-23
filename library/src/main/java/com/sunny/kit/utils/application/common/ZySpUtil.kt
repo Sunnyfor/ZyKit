@@ -7,7 +7,6 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.sunny.kit.utils.application.ZyKit
 
-
 class ZySpUtil private constructor() {
 
     private lateinit var fileName: String
@@ -112,6 +111,7 @@ class ZySpUtil private constructor() {
     /**
      * 获取List信息
      */
+    @Suppress("UNCHECKED_CAST")
     inline fun <reified T> getList(key: String): List<T>? {
         val json = getString(key)
         if (TextUtils.isEmpty(json)) {
@@ -121,7 +121,7 @@ class ZySpUtil private constructor() {
         return try {
             val type = TypeToken.getParameterized(List::class.java, T::class.java)
             val gSon = Gson()
-            gSon.fromJson(json, type) as List<T>?
+            gSon.fromJson(json, type) as List<T>
         } catch (e: Exception) {
             null
         }
