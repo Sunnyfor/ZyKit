@@ -3,11 +3,14 @@ package com.sunny.kit.utils.application
 import android.app.Application
 import android.content.Context
 import androidx.lifecycle.ViewModelProvider
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.sunny.kit.utils.application.common.ZyCacheUtil
 import com.sunny.kit.utils.application.common.ZyDateUtil
 import com.sunny.kit.utils.application.common.ZyDensityUtil
 import com.sunny.kit.utils.application.common.ZyEncryptionUtil
 import com.sunny.kit.utils.application.common.ZyFileUtil
+import com.sunny.kit.utils.application.common.ZyGsonUtil
 import com.sunny.kit.utils.application.common.ZyLogUtil
 import com.sunny.kit.utils.application.common.ZyMoneyUtil
 import com.sunny.kit.utils.application.common.ZyNetworkUtil
@@ -21,6 +24,7 @@ import com.sunny.kit.utils.domain.common.ZyDateUtilImpl
 import com.sunny.kit.utils.domain.common.ZyDensityUtilImpl
 import com.sunny.kit.utils.domain.common.ZyEncryptionUtilImpl
 import com.sunny.kit.utils.domain.common.ZyFileUtilImpl
+import com.sunny.kit.utils.domain.common.ZyGsonUtilImpl
 import com.sunny.kit.utils.domain.common.ZyLogUtilImpl
 import com.sunny.kit.utils.domain.common.ZyMoneyUtilImpl
 import com.sunny.kit.utils.domain.common.ZyNetworkUtilImpl
@@ -40,6 +44,13 @@ object ZyKit {
 
     private lateinit var instance: Application
 
+    /**
+     * 获取 authorities
+     */
+    val authorities: String
+        get() {
+            return "${instance.packageName}.provider"
+        }
 
     /**
      * 缓存工具
@@ -147,6 +158,27 @@ object ZyKit {
     }
 
     /**
+     * Gson工具
+     */
+    val gsonUtil: ZyGsonUtil by lazy {
+        ZyGsonUtilImpl()
+    }
+
+    /**
+     * Gson
+     */
+    val gson: Gson by lazy {
+        gsonUtil.getGson()
+    }
+
+    /**
+     * GsonBuilder
+     */
+    val gsonBuilder: GsonBuilder by lazy {
+        gsonUtil.getGsonBuilder()
+    }
+
+    /**
      * 初始化
      */
     fun init(application: Application) {
@@ -154,16 +186,14 @@ object ZyKit {
     }
 
 
-    val authorities: String
-        get() {
-            return "${instance.packageName}.provider"
-        }
-
-
+    /**
+     * 获取Context
+     */
     fun getContext(): Context {
         if (::instance.isInitialized) {
             return instance
         }
         throw IllegalStateException("请先调用ZyKit.init(application: Application)方法初始化")
     }
+
 }
