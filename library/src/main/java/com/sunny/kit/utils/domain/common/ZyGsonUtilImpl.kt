@@ -9,15 +9,12 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
 import com.google.gson.TypeAdapterFactory
-import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-import com.sunny.kit.utils.application.ZyKit
 import com.sunny.kit.utils.application.common.ZyGsonUtil
 import java.lang.reflect.Type
-import kotlin.reflect.KClass
 
 internal class ZyGsonUtilImpl : ZyGsonUtil {
 
@@ -115,36 +112,27 @@ internal class ZyGsonUtilImpl : ZyGsonUtil {
             val fields = clazz?.declaredFields
             fieldFor@ fields?.forEach { field ->
                 field.isAccessible = true
-
                 val fieldName = field.getAnnotation(SerializedName::class.java)?.value ?: field.name
-
-                val deserialize = field.getAnnotation(Expose::class.java)?.deserialize ?: true
-
-                if (deserialize) {
-                    when (field.type.name) {
-                        String::class.java.name -> {
-                            if (!jsonObject.has(fieldName) || jsonObject.get(fieldName).isJsonNull) {
-                                jsonObject.addProperty(fieldName, "")
-                            }
+                when (field.type.name) {
+                    String::class.java.name -> {
+                        if (!jsonObject.has(fieldName) || jsonObject.get(fieldName).isJsonNull) {
+                            jsonObject.addProperty(fieldName, "")
                         }
+                    }
 
-                        List::class.java.name, ArrayList::class.java.name -> {
+                    List::class.java.name, ArrayList::class.java.name -> {
+                        if (!jsonObject.has(fieldName) || jsonObject.get(fieldName).isJsonNull) {
+                            jsonObject.add(fieldName, JsonArray())
+                        }
+                    }
+
+                    else -> {
+                        if (field.type.isArray) {
                             if (!jsonObject.has(fieldName) || jsonObject.get(fieldName).isJsonNull) {
                                 jsonObject.add(fieldName, JsonArray())
                             }
                         }
-
-                        else -> {
-                            if (field.type.isArray) {
-                                if (!jsonObject.has(fieldName) || jsonObject.get(fieldName).isJsonNull) {
-                                    jsonObject.add(fieldName, JsonArray())
-                                }
-                            }
-                        }
                     }
-                } else {
-//                        val value = field.get(Class.forName(clazz.name))
-//                    ZyKit.log.e("忽略序列化字段${field.name} 值：$value")
                 }
             }
         }
