@@ -49,14 +49,14 @@ object ZyKit {
      */
     val authorities: String
         get() {
-            return "${instance.packageName}.provider"
+            return "${getContext().packageName}.provider"
         }
 
     /**
      * 缓存工具
      */
     val cache: ZyCacheUtil by lazy {
-        ViewModelProvider.AndroidViewModelFactory(instance).create(ZyCacheUtil::class.java)
+        ViewModelProvider.AndroidViewModelFactory(getContext()).create(ZyCacheUtil::class.java)
     }
 
     /**
@@ -189,7 +189,7 @@ object ZyKit {
     /**
      * 获取Context
      */
-    fun getContext(): Context {
+    fun getContext(): Application {
         if (::instance.isInitialized) {
             return instance
         }
