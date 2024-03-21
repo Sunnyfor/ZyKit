@@ -28,7 +28,7 @@ internal class ZyLogUtilImpl : ZyLogUtil {
     private val error = 4
 
     private var steIndex = 5
-    private var lineSize = 160
+    private var lineLength = 160
 
     private var topBorder = "┌"
     private var bottomBorder = "└"
@@ -41,28 +41,62 @@ internal class ZyLogUtilImpl : ZyLogUtil {
     private var titleEnd = "】"
 
 
-    override fun v(message: String, title: String, isShowSource: Boolean) {
+    init {
+        setLineLength(lineLength)
+    }
+
+    fun setLineLength(length: Int) {
+        lineLength = length
+        val sb = StringBuilder()
+        for (i in 0 until lineLength) {
+            sb.append(horizontalLine)
+        }
+        horizontalLine = sb.toString()
+    }
+
+
+    override fun v(title: String, message: String, isShowSource: Boolean) {
         print(verbose, title, message, isShowSource)
     }
 
-    override fun d(message: String, title: String, isShowSource: Boolean) {
+    override fun v(message: String, isShowSource: Boolean) {
+        v("", message, isShowSource)
+    }
+
+    override fun d(title: String, message: String, isShowSource: Boolean) {
         print(debug, title, message, isShowSource)
     }
 
-    override fun i(message: String, title: String, isShowSource: Boolean) {
+    override fun d(message: String, isShowSource: Boolean) {
+        d("", message, isShowSource)
+    }
+
+    override fun i(title: String, message: String, isShowSource: Boolean) {
         print(info, title, message, isShowSource)
     }
 
-    override fun w(message: String, title: String, isShowSource: Boolean) {
+    override fun i(message: String, isShowSource: Boolean) {
+        i("", message, isShowSource)
+    }
+
+    override fun w(title: String, message: String, isShowSource: Boolean) {
         print(warn, title, message, isShowSource)
     }
 
-    override fun e(message: String, title: String, isShowSource: Boolean) {
+    override fun w(message: String, isShowSource: Boolean) {
+        w("", message, isShowSource)
+    }
+
+    override fun e(title: String, message: String, isShowSource: Boolean) {
         print(error, title, message, isShowSource)
     }
 
+    override fun e(message: String, isShowSource: Boolean) {
+        e("", message, isShowSource)
+    }
 
-    private fun generateTitle(logType: Int, title: String, isShowSource: Boolean) {
+
+    private fun printTitle(logType: Int, title: String, isShowSource: Boolean) {
         val sb = StringBuilder(verticalLine)
         sb.append("$titleStart$title$titleEnd")
         if (isShowSource) {
@@ -83,76 +117,66 @@ internal class ZyLogUtilImpl : ZyLogUtil {
     }
 
 
-    private fun generateBorder(logType: Int, borderType: String) {
+    private fun printBorder(logType: Int, borderType: String) {
         val sb = StringBuilder()
         sb.append(borderType)
-        var isEnd = true
-        while (isEnd) {
-            sb.append(horizontalLine)
-            val size = sb.length
-            if (size == lineSize) {
-                isEnd = false
-            }
-        }
+        sb.append(horizontalLine)
         log(logType, sb.toString())
     }
 
 
-    private fun generateLine(logType: Int, content: String?) {
+    private fun printContent(logType: Int, content: String?) {
         if (content == null) {
             return
         }
-        val msgArray = content.toCharArray()
-        val msgSb = StringBuilder()
-        msgSb.append(verticalLine)
-        var chineseCount = 0
-        msgArray.forEachIndexed { index, c ->
-            if (c != '\n') {
-                msgSb.append(c)
-                if (c.toString().matches(Regex("[^x00-xf]"))) {
-                    chineseCount++
-                }
-            }
-            val size = msgSb.length
-            val total = lineSize - (chineseCount / 2)
-            if (size >= total || c == '\n') {
-                log(logType, msgSb.toString())
-                chineseCount = 0
-                msgSb.clear()
-                msgSb.append(verticalLine)
-            }
-
-            if (index == msgArray.size - 1) {
-                if (msgSb.isNotEmpty()) {
+        var msgLength = 0
+        val msgSb = StringBuilder(verticalLine)
+        content.forEachIndexed { index, c ->
+            if (c == '\n') {
+                if (msgSb.length > 2) {
                     log(logType, msgSb.toString())
+                    msgSb.setLength(0)
+                    msgSb.append(verticalLine)
+                    msgLength = 0
                 }
-                generateBorder(logType, bottomBorder)
+            } else {
+                val charLength = if (c.code in 0x4E00..0x9FFF) 2 else 1
+                if (msgLength + charLength > lineLength) {
+                    log(logType, msgSb.toString())
+                    msgSb.setLength(0)
+                    msgSb.append(verticalLine)
+                    msgLength = 0
+                } else {
+                    msgSb.append(c)
+                    msgLength += charLength
+                }
             }
-
+        }
+        if (msgSb.length > 2) {
+            log(logType, msgSb.toString())
         }
     }
 
 
     private fun print(logType: Int, title: String, message: String, isShowSource: Boolean) {
-        generateBorder(logType, topBorder)
+        printBorder(logType, topBorder)
         if (title.isNotEmpty()) {
-            generateTitle(logType, title, isShowSource)
-            generateBorder(logType, middleLine)
+            printTitle(logType, title, isShowSource)
+            printBorder(logType, middleLine)
         } else {
             if (isShowSource) {
                 log(logType, verticalLine + getSourceStr(0))
             }
         }
-        generateLine(logType, message)
+        printContent(logType, message)
+        printBorder(logType, bottomBorder)
     }
 
 
     private fun log(logType: Int, content: String) {
-
         if (!isDebug) {
             return
         }
-
         when (logType) {
             verbose -> Log.v(logTag, content)
             debug -> Log.d(logTag, content)
