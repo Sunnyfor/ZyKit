@@ -29,4 +29,14 @@ internal class ZyDateUtilImpl : ZyDateUtil {
         return simpleDateFormat.format(Date(date))
     }
 
+    override fun formatTime(date: String, pattern: String): Long {
+        return try {
+            val simpleDateFormat = SimpleDateFormat(pattern, Locale.getDefault())
+            simpleDateFormat.parse(date)?.time ?: 0
+        } catch (e: Exception) {
+            e.printStackTrace()
+            0
+        }
+    }
+
 }
