@@ -1,7 +1,6 @@
 package com.sunny.kit.utils.application
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
