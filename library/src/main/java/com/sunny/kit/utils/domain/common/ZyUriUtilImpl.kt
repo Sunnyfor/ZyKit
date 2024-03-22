@@ -27,9 +27,19 @@ class ZyUriUtilImpl : ZyUriUtil {
     /**
      * 通过URI获取文件路径
      */
-    private fun queryFilePath(uri: Uri, selection: String? = null, selectionArgs: Array<String>? = null): String {
+    private fun queryFilePath(
+        uri: Uri,
+        selection: String? = null,
+        selectionArgs: Array<String>? = null
+    ): String {
         val projection = arrayOf(MediaStore.Files.FileColumns.DATA)
-        val cursor = ZyKit.getContext().contentResolver.query(uri, projection, selection, selectionArgs, null)
+        val cursor = ZyKit.getContext().contentResolver.query(
+            uri,
+            projection,
+            selection,
+            selectionArgs,
+            null
+        )
         cursor?.use {
             val columnIndex = it.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)
             if (it.moveToFirst()) {
@@ -54,7 +64,13 @@ class ZyUriUtilImpl : ZyUriUtil {
                     filePath = if ("primary".equals(storageType, true)) {
                         "${Environment.getExternalStorageDirectory()}/" + split[1]
                     } else {
-                        "${System.getenv("ANDROID_STORAGE")}/${split[0]}/${split[1]}"
+                        val path = "${System.getenv("ANDROID_STORAGE")}/${split[0]}"
+                        val file = File(path)
+                        if (file.exists()) {
+                            "${path}/${split[1]}"
+                        } else {
+                            "${System.getenv("ANDROID_STORAGE")}/sdcard/${split[1]}"
+                        }
                     }
                 }
             }
@@ -106,7 +122,7 @@ class ZyUriUtilImpl : ZyUriUtil {
             else -> {
                 if ("content".equals(uri.scheme, true)) {
                     filePath = queryFilePath(uri)
-                } else if ("content".equals(uri.scheme, true)) {
+                } else if ("file".equals(uri.scheme, true)) {
                     filePath = uri.path
                 }
             }
