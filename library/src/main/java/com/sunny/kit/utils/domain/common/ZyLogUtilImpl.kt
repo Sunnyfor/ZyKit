@@ -2,6 +2,12 @@ package com.sunny.kit.utils.domain.common
 
 import android.util.Log
 import com.sunny.kit.utils.application.common.ZyLogUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 /**
  * Desc 封装使用Log日志代码
@@ -15,6 +21,9 @@ internal class ZyLogUtilImpl : ZyLogUtil {
      * 是否打印LOG
      */
     override var isDebug = true
+
+    private val maxCount = 140
+    private var currentCount = 0
 
     /**
      * 设置Log标签名
@@ -40,12 +49,17 @@ internal class ZyLogUtilImpl : ZyLogUtil {
 
     private var titleEnd = "】"
 
+    private val scope by lazy { CoroutineScope(IO) }
+
+    private val mutex by lazy { Mutex() }
+
+    private var blockTimeMillis = 0L
 
     init {
         setLineLength(lineLength)
     }
 
-    fun setLineLength(length: Int) {
+    override fun setLineLength(length: Int) {
         lineLength = length
         val sb = StringBuilder()
         for (i in 0 until lineLength) {
@@ -96,7 +110,7 @@ internal class ZyLogUtilImpl : ZyLogUtil {
     }
 
 
-    private fun printTitle(logType: Int, title: String, isShowSource: Boolean) {
+    private suspend fun printTitle(logType: Int, title: String, isShowSource: Boolean) {
         val sb = StringBuilder(verticalLine)
         sb.append("$titleStart$title$titleEnd")
         if (isShowSource) {
@@ -117,7 +131,7 @@ internal class ZyLogUtilImpl : ZyLogUtil {
     }
 
 
-    private fun printBorder(logType: Int, borderType: String) {
+    private suspend fun printBorder(logType: Int, borderType: String) {
         val sb = StringBuilder()
         sb.append(borderType)
         sb.append(horizontalLine)
@@ -125,10 +139,11 @@ internal class ZyLogUtilImpl : ZyLogUtil {
     }
 
 
-    private fun printContent(logType: Int, content: String?) {
+    private suspend fun printContent(logType: Int, content: String?) {
         if (content == null) {
             return
         }
+
         var msgLength = 0
         val msgSb = StringBuilder(verticalLine)
         content.forEach {
@@ -157,30 +172,50 @@ internal class ZyLogUtilImpl : ZyLogUtil {
 
 
     private fun print(logType: Int, title: String, message: String, isShowSource: Boolean) {
-        printBorder(logType, topBorder)
-        if (title.isNotEmpty()) {
-            printTitle(logType, title, isShowSource)
-            printBorder(logType, middleLine)
-        } else {
-            if (isShowSource) {
-                log(logType, verticalLine + getSourceStr(0))
+        scope.launch {
+            mutex.withLock {
+                printBorder(logType, topBorder)
+                if (title.isNotEmpty()) {
+                    printTitle(logType, title, isShowSource)
+                    printBorder(logType, middleLine)
+                } else {
+                    if (isShowSource) {
+                        log(logType, verticalLine + getSourceStr(0))
+                    }
+                }
+                printContent(logType, message)
+                printBorder(logType, bottomBorder)
             }
         }
-        printContent(logType, message)
-        printBorder(logType, bottomBorder)
+
+
     }
 
 
-    private fun log(logType: Int, content: String) {
+    private suspend fun log(logType: Int, content: String) {
         if (!isDebug) {
             return
         }
+
         when (logType) {
             verbose -> Log.v(logTag, content)
             debug -> Log.d(logTag, content)
             info -> Log.i(logTag, content)
             warn -> Log.w(logTag, content)
             error -> Log.e(logTag, content)
+        }
+
+        if (System.currentTimeMillis() - blockTimeMillis < 1000) {
+            currentCount++
+        } else {
+            currentCount = 0
+            blockTimeMillis = System.currentTimeMillis()
+        }
+
+        if (currentCount >= maxCount) {
+            currentCount = 0
+            blockTimeMillis = System.currentTimeMillis()
+            delay(1000)
         }
     }
 }

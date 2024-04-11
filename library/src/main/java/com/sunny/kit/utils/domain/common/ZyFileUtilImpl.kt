@@ -11,21 +11,17 @@ import java.text.DecimalFormat
 
 internal class ZyFileUtilImpl : ZyFileUtil {
 
-    var rootPath = "temp"
-
     /**
      * 获取私有目录文件路径
      */
-    override fun getExternalFilesDir(): String {
-        val temp = ZyKit.getContext().getExternalFilesDir(rootPath)
-        var path = ""
-        temp?.let {
-            if (!it.exists()) {
-                it.mkdir()
+    override fun getExternalFilesDir(rootPath: String): String {
+        val path = rootPath.ifEmpty { "temp" }
+        val rootFile = ZyKit.getContext().getExternalFilesDir(path)
+        return rootFile?.apply {
+            if (!exists()) {
+                mkdir()
             }
-            path = it.path
-        }
-        return path
+        }?.path ?: ""
     }
 
 

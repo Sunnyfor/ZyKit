@@ -4,6 +4,8 @@ interface ZyLogUtil {
 
     var isDebug: Boolean
 
+    fun setLineLength(length: Int)
+
     fun v(title: String, message: String, isShowSource: Boolean = false)
     fun v(message: String, isShowSource: Boolean = false)
 

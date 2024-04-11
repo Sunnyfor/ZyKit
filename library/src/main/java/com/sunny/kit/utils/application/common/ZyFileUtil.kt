@@ -7,7 +7,7 @@ interface ZyFileUtil {
     /**
      * 获取私有目录文件路径
      */
-    fun getExternalFilesDir(): String
+    fun getExternalFilesDir(rootPath:String=""): String
 
     /**
      * 根据文件名获取文件

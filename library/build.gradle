@@ -19,7 +19,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -56,3 +56,13 @@ afterEvaluate {
         }
     }
 }
+
+task makeJar(type: Copy) {
+    delete 'build/libs/ZyKit.jar'
+    from('build/intermediates/bundles/release/')
+    into('build/libs/')
+    include('classes.jar')
+    rename ('classes.jar', 'ZyKit.jar')
+}
+
+makeJar.dependsOn(build) //在终端运行生成JAR包 // gradlew makeJar
