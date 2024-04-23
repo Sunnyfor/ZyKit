@@ -22,7 +22,7 @@ internal class ZyLogUtilImpl : ZyLogUtil {
      */
     override var isDebug = true
 
-    private val maxCount = 140
+    private var linesPerSecond = 250
     private var currentCount = 0
 
     /**
@@ -66,6 +66,10 @@ internal class ZyLogUtilImpl : ZyLogUtil {
             sb.append(horizontalLine)
         }
         horizontalLine = sb.toString()
+    }
+
+    override fun setLinesPerSecond(value: Int) {
+        this.linesPerSecond = value
     }
 
 
@@ -204,17 +208,19 @@ internal class ZyLogUtilImpl : ZyLogUtil {
             error -> Log.e(logTag, content)
         }
 
-        if (System.currentTimeMillis() - blockTimeMillis < 1000) {
-            currentCount++
-        } else {
-            currentCount = 0
-            blockTimeMillis = System.currentTimeMillis()
-        }
+        if (linesPerSecond > 0) {
+            if (System.currentTimeMillis() - blockTimeMillis < 1000) {
+                currentCount++
+            } else {
+                currentCount = 0
+                blockTimeMillis = System.currentTimeMillis()
+            }
 
-        if (currentCount >= maxCount) {
-            currentCount = 0
-            blockTimeMillis = System.currentTimeMillis()
-            delay(1000)
+            if (currentCount >= linesPerSecond) {
+                currentCount = 0
+                blockTimeMillis = System.currentTimeMillis()
+                delay(1000)
+            }
         }
     }
 }
