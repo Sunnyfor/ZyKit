@@ -146,26 +146,25 @@ internal class ZyLogUtilImpl : ZyLogUtil {
 
         var msgLength = 0
         val msgSb = StringBuilder(verticalLine)
-        content.forEach {
-            if (it.code == 10) {
+        content.forEach { char ->
+            if (char.code == 10) {  // '\n' (newline character)
                 log(logType, msgSb.toString())
-                msgSb.setLength(0)
+                msgSb.clear()
                 msgSb.append(verticalLine)
                 msgLength = 0
             } else {
-                val charLength = if (it.code in 0x4E00..0x9FFF) 2 else 1
+                val charLength = if (char.code in 0x4E00..0x9FFF) 2 else 1
                 if (msgLength + charLength > lineLength) {
                     log(logType, msgSb.toString())
-                    msgSb.setLength(0)
+                    msgSb.clear()
                     msgSb.append(verticalLine)
                     msgLength = 0
-                } else {
-                    msgSb.append(it)
-                    msgLength += charLength
                 }
+                msgSb.append(char)
+                msgLength += charLength
             }
         }
-        if (msgSb.length > 2) {
+        if (msgSb.length > verticalLine.length) {
             log(logType, msgSb.toString())
         }
     }
