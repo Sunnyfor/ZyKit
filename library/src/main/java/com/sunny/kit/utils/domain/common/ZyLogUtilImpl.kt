@@ -30,13 +30,6 @@ internal class ZyLogUtilImpl : ZyLogUtil {
      */
     private var logTag = "ZYLog"
 
-    private val verbose = 0
-    private val debug = 1
-    private val info = 2
-    private val warn = 3
-    private val error = 4
-
-    private var steIndex = 5
     private var lineLength = 160
 
     private var topBorder = "┌"
@@ -72,68 +65,106 @@ internal class ZyLogUtilImpl : ZyLogUtil {
         this.linesPerSecond = value
     }
 
-
-    override fun v(title: String, message: String, isShowSource: Boolean) {
-        print(verbose, title, message, isShowSource)
-    }
-
-    override fun v(message: String, isShowSource: Boolean) {
-        v("", message, isShowSource)
-    }
-
-    override fun d(title: String, message: String, isShowSource: Boolean) {
-        print(debug, title, message, isShowSource)
-    }
-
-    override fun d(message: String, isShowSource: Boolean) {
-        d("", message, isShowSource)
-    }
-
-    override fun i(title: String, message: String, isShowSource: Boolean) {
-        print(info, title, message, isShowSource)
-    }
-
-    override fun i(message: String, isShowSource: Boolean) {
-        i("", message, isShowSource)
-    }
-
-    override fun w(title: String, message: String, isShowSource: Boolean) {
-        print(warn, title, message, isShowSource)
-    }
-
-    override fun w(message: String, isShowSource: Boolean) {
-        w("", message, isShowSource)
-    }
-
-    override fun e(title: String, message: String, isShowSource: Boolean) {
-        print(error, title, message, isShowSource)
-    }
-
-    override fun e(message: String, isShowSource: Boolean) {
-        e("", message, isShowSource)
+    override fun setTag(tag: String) {
+        logTag = tag
     }
 
 
-    private suspend fun printTitle(logType: Int, title: String, isShowSource: Boolean) {
-        val sb = StringBuilder(verticalLine)
-        sb.append("$titleStart$title$titleEnd")
-        if (isShowSource) {
-            sb.append("  ")
-            sb.append(getSourceStr(1))
+    override fun v(title: String, message: String, isShowStackTrace: Boolean) {
+        print(Log.VERBOSE, title, message, isShowStackTrace)
+    }
+
+    override fun v(message: String, isShowStackTrace: Boolean) {
+        v("", message, isShowStackTrace)
+    }
+
+    override fun d(title: String, message: String, isShowStackTrace: Boolean) {
+        print(Log.DEBUG, title, message, isShowStackTrace)
+    }
+
+    override fun d(message: String, isShowStackTrace: Boolean) {
+        d("", message, isShowStackTrace)
+    }
+
+    override fun i(title: String, message: String, isShowStackTrace: Boolean) {
+        print(Log.INFO, title, message, isShowStackTrace)
+    }
+
+    override fun i(message: String, isShowStackTrace: Boolean) {
+        i("", message, isShowStackTrace)
+    }
+
+    override fun w(title: String, message: String, isShowStackTrace: Boolean) {
+        print(Log.WARN, title, message, isShowStackTrace)
+    }
+
+    override fun w(message: String, isShowStackTrace: Boolean) {
+        w("", message, isShowStackTrace)
+    }
+
+    override fun e(title: String, message: String, isShowStackTrace: Boolean) {
+        print(Log.ERROR, title, message, isShowStackTrace)
+    }
+
+    override fun e(message: String, isShowStackTrace: Boolean) {
+        e("", message, isShowStackTrace)
+    }
+
+    override fun println(message: String) {
+        println(Log.INFO, message)
+    }
+
+    override fun println(logType: Int, message: String) {
+        scope.launch {
+            mutex.withLock {
+                log(logType, message)
+            }
         }
-        log(logType, sb.toString())
-
     }
 
+    private fun print(logType: Int, title: String, message: String, isShowStackTrace: Boolean) {
+        var sourceStr = ""
+        if (isShowStackTrace) {
+            sourceStr = getSourceStr()
+        }
+        scope.launch {
+            mutex.withLock {
+                printBorder(logType, topBorder)
+                if (title.isNotEmpty() || sourceStr.isNotEmpty()) {
+                    printTitle(logType, title, sourceStr)
+                    printBorder(logType, middleLine)
+                }
+                printContent(logType, message)
+                printBorder(logType, bottomBorder)
+            }
+        }
+    }
 
-    private fun getSourceStr(complement: Int): String {
-        val ste = Thread.currentThread().stackTrace
-        if (ste.size >= steIndex + complement) {
-            return ste[steIndex + complement].toString()
+    private fun getSourceStr(): String {
+        val stacks = Thread.currentThread().stackTrace
+        var stackIndex = -1
+        stacks.forEachIndexed { index, stackTraceElement ->
+            if (stackTraceElement.className == javaClass.name) {
+                stackIndex = index + 1
+            }
+        }
+        if (stacks.size >= stackIndex) {
+            return stacks[stackIndex].toString()
         }
         return ""
     }
 
+    private suspend fun printTitle(logType: Int, title: String, subTitle: String) {
+        val sb = StringBuilder(verticalLine)
+        if (title.isNotEmpty()) {
+            sb.append("$titleStart$title$titleEnd").append("  ")
+        }
+        if (subTitle.isNotEmpty()) {
+            sb.append(subTitle)
+        }
+        log(logType, sb.toString())
+
+    }
 
     private suspend fun printBorder(logType: Int, borderType: String) {
         val sb = StringBuilder()
@@ -141,7 +172,6 @@ internal class ZyLogUtilImpl : ZyLogUtil {
         sb.append(horizontalLine)
         log(logType, sb.toString())
     }
-
 
     private suspend fun printContent(logType: Int, content: String?) {
         if (content == null) {
@@ -174,38 +204,17 @@ internal class ZyLogUtilImpl : ZyLogUtil {
     }
 
 
-    private fun print(logType: Int, title: String, message: String, isShowSource: Boolean) {
-        scope.launch {
-            mutex.withLock {
-                printBorder(logType, topBorder)
-                if (title.isNotEmpty()) {
-                    printTitle(logType, title, isShowSource)
-                    printBorder(logType, middleLine)
-                } else {
-                    if (isShowSource) {
-                        log(logType, verticalLine + getSourceStr(0))
-                    }
-                }
-                printContent(logType, message)
-                printBorder(logType, bottomBorder)
-            }
-        }
-
-
-    }
-
-
     private suspend fun log(logType: Int, content: String) {
         if (!isDebug) {
             return
         }
 
         when (logType) {
-            verbose -> Log.v(logTag, content)
-            debug -> Log.d(logTag, content)
-            info -> Log.i(logTag, content)
-            warn -> Log.w(logTag, content)
-            error -> Log.e(logTag, content)
+            Log.VERBOSE -> Log.v(logTag, content)
+            Log.DEBUG -> Log.d(logTag, content)
+            Log.INFO -> Log.i(logTag, content)
+            Log.WARN -> Log.w(logTag, content)
+            Log.ERROR -> Log.e(logTag, content)
         }
 
         if (linesPerSecond > 0) {
