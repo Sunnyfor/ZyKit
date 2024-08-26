@@ -1,6 +1,7 @@
 package com.sunny.kit.utils.application
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -55,7 +56,7 @@ object ZyKit {
      * 缓存工具
      */
     val cache: ZyCacheUtil by lazy {
-        ViewModelProvider.AndroidViewModelFactory(getContext()).create(ZyCacheUtil::class.java)
+        ViewModelProvider.AndroidViewModelFactory(getApplication()).create(ZyCacheUtil::class.java)
     }
 
     /**
@@ -184,15 +185,21 @@ object ZyKit {
         instance = application
     }
 
-
     /**
-     * 获取Context
+     * 获取Application
      */
-    fun getContext(): Application {
+    fun getApplication(): Application {
         if (::instance.isInitialized) {
             return instance
         }
         throw IllegalStateException("请先调用ZyKit.init(application: Application)方法初始化")
+    }
+
+    /**
+     * 获取Context
+     */
+    fun getContext(): Context {
+        return getApplication().applicationContext
     }
 
 }

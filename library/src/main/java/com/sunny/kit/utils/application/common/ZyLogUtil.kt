@@ -7,7 +7,7 @@ interface ZyLogUtil {
     /**
      * 设置每行打印长度
      */
-    fun setLineLength(length: Int)
+    fun setMaxLogLength(length: Int)
 
     /**
      * 设置每秒打印行数

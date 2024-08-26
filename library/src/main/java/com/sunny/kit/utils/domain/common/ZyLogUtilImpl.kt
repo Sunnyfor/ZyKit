@@ -38,9 +38,9 @@ internal class ZyLogUtilImpl : ZyLogUtil {
     private var verticalLine = "│ "
     private var horizontalLine = "─"
 
-    private var titleStart = "【"
+    private var titleStart = "\uD83D\uDD25"
 
-    private var titleEnd = "】"
+    private var titleEnd = "\uD83D\uDD25"
 
     private val scope by lazy { CoroutineScope(IO) }
 
@@ -49,16 +49,12 @@ internal class ZyLogUtilImpl : ZyLogUtil {
     private var blockTimeMillis = 0L
 
     init {
-        setLineLength(lineLength)
+        setMaxLogLength(lineLength)
     }
 
-    override fun setLineLength(length: Int) {
+    override fun setMaxLogLength(length: Int) {
         lineLength = length
-        val sb = StringBuilder()
-        for (i in 0 until lineLength) {
-            sb.append(horizontalLine)
-        }
-        horizontalLine = sb.toString()
+        horizontalLine = horizontalLine.repeat(length)
     }
 
     override fun setLinesPerSecond(value: Int) {
@@ -157,7 +153,7 @@ internal class ZyLogUtilImpl : ZyLogUtil {
     private suspend fun printTitle(logType: Int, title: String, subTitle: String) {
         val sb = StringBuilder(verticalLine)
         if (title.isNotEmpty()) {
-            sb.append("$titleStart$title$titleEnd").append("  ")
+            sb.append("$titleStart $title $titleEnd").append("  ")
         }
         if (subTitle.isNotEmpty()) {
             sb.append(subTitle)
