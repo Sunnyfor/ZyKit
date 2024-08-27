@@ -13,15 +13,14 @@ import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-import com.sunny.kit.utils.application.common.ZyGsonUtil
 import java.lang.reflect.Type
 
-internal class ZyGsonUtilImpl : ZyGsonUtil {
+internal class ZyGsonUtilImpl {
 
     /**
      * 获取GsonBuilder
      */
-    override fun getGsonBuilder(): GsonBuilder {
+    private fun getGsonBuilder(): GsonBuilder {
         return GsonBuilder()
             .registerTypeAdapterFactory(NullToDefaultAdapterFactory())
             .registerTypeAdapter(Int::class.javaPrimitiveType, object : JsonDeserializer<Int> {
@@ -75,14 +74,13 @@ internal class ZyGsonUtilImpl : ZyGsonUtil {
     /**
      * 获取Gson
      */
-    override fun getGson(): Gson {
+    fun getGson(): Gson {
         return getGsonBuilder().create()
     }
 
     /**
      * 空值转默认值
      */
-    @Suppress("UNCHECKED_CAST")
     private class NullToDefaultAdapterFactory : TypeAdapterFactory {
 
         override fun <T> create(gson: Gson?, type: TypeToken<T>?): TypeAdapter<T> {
@@ -110,7 +108,7 @@ internal class ZyGsonUtilImpl : ZyGsonUtil {
         private fun <T> areAllFieldsDefined(jsonObject: JsonObject, clazz: Class<T>?) {
 
             val fields = clazz?.declaredFields
-            fieldFor@ fields?.forEach { field ->
+            fields?.forEach { field ->
                 field.isAccessible = true
                 val fieldName = field.getAnnotation(SerializedName::class.java)?.value ?: field.name
                 when (field.type.name) {

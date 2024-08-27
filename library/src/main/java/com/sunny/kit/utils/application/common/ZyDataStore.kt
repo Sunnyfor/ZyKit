@@ -4,16 +4,18 @@ import android.util.ArrayMap
 import com.sunny.kit.utils.application.ZyKit
 
 open class ZyDataStore {
+    private val storeMap = ArrayMap<String, Any>()
 
-    val mMap = ArrayMap<String, Any>()
+    fun get() = storeMap
 
-    fun set(key: String, value: Any) {
-        mMap[key] = value
+    fun set(key: String, value: Any): ZyDataStore {
+        storeMap[key] = value
+        return this
     }
 
 
     inline fun <reified T> get(key: String): T? {
-        val value = mMap[key]
+        val value = get()[key]
         if (value is T) {
             return value
         }
@@ -21,12 +23,17 @@ open class ZyDataStore {
         return null
     }
 
-    fun remove(key: String) {
-        mMap.remove(key)
+    fun remove(key: String): ZyDataStore {
+        storeMap.remove(key)
+        return this
     }
 
     open fun clear(): ZyDataStore {
-        mMap.clear()
+        storeMap.clear()
         return this
+    }
+
+    fun formatJson(): String {
+        return ZyKit.gson.toJson(storeMap)
     }
 }

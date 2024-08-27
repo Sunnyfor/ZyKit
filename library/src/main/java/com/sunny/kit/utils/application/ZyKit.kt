@@ -4,13 +4,11 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.sunny.kit.utils.application.common.ZyCacheUtil
+import com.sunny.kit.utils.application.common.ZyCacheViewModel
 import com.sunny.kit.utils.application.common.ZyDateUtil
 import com.sunny.kit.utils.application.common.ZyDensityUtil
 import com.sunny.kit.utils.application.common.ZyEncryptionUtil
 import com.sunny.kit.utils.application.common.ZyFileUtil
-import com.sunny.kit.utils.application.common.ZyGsonUtil
 import com.sunny.kit.utils.application.common.ZyLogUtil
 import com.sunny.kit.utils.application.common.ZyMoneyUtil
 import com.sunny.kit.utils.application.common.ZyNetworkUtil
@@ -44,6 +42,8 @@ object ZyKit {
 
     private lateinit var instance: Application
 
+    private val spCache = hashMapOf<String, ZySpUtil>()
+
     /**
      * 获取 authorities
      */
@@ -55,22 +55,27 @@ object ZyKit {
     /**
      * 缓存工具
      */
-    val cache: ZyCacheUtil by lazy {
-        ViewModelProvider.AndroidViewModelFactory(getApplication()).create(ZyCacheUtil::class.java)
+    val cache: ZyCacheViewModel by lazy {
+        ViewModelProvider.AndroidViewModelFactory(getApplication()).create(ZyCacheViewModel::class.java)
     }
 
     /**
      * SharedPreferences工具
      */
     val sp by lazy {
-        ZySpUtil.get()
+        sp()
     }
 
     /**
      * SharedPreferences工具
      */
-    fun sp(fineName: String): ZySpUtil {
-        return ZySpUtil.get(fineName)
+    fun sp(fineName: String = "sharedPreferences_info"): ZySpUtil {
+        var spUtil = spCache[fineName]
+        if (spUtil == null) {
+            spUtil = ZySpUtil(fineName)
+            spCache[fineName] = spUtil
+        }
+        return spUtil
     }
 
     /**
@@ -157,26 +162,14 @@ object ZyKit {
         ZyToastUtilImpl()
     }
 
-    /**
-     * Gson工具
-     */
-    val gsonUtil: ZyGsonUtil by lazy {
-        ZyGsonUtilImpl()
-    }
 
     /**
      * Gson
      */
     val gson: Gson by lazy {
-        gsonUtil.getGson()
+        ZyGsonUtilImpl().getGson()
     }
 
-    /**
-     * GsonBuilder
-     */
-    val gsonBuilder: GsonBuilder by lazy {
-        gsonUtil.getGsonBuilder()
-    }
 
     /**
      * 初始化
