@@ -14,7 +14,7 @@ class ZyCacheViewModel : ViewModel() {
     }
 
 
-    fun observe(owner: LifecycleOwner, observer: Observer<ZyDataStore>) {
+    fun bind(owner: LifecycleOwner, observer: Observer<ZyDataStore>) {
         storeMapLiveData.observe(owner, observer)
     }
 

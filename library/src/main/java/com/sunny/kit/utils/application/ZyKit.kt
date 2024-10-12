@@ -7,6 +7,7 @@ import com.google.gson.Gson
 import com.sunny.kit.utils.application.common.ZyCacheViewModel
 import com.sunny.kit.utils.application.common.ZyDateUtil
 import com.sunny.kit.utils.application.common.ZyDensityUtil
+import com.sunny.kit.utils.application.common.ZyDevicesUtil
 import com.sunny.kit.utils.application.common.ZyEncryptionUtil
 import com.sunny.kit.utils.application.common.ZyFileUtil
 import com.sunny.kit.utils.application.common.ZyLogUtil
@@ -20,6 +21,7 @@ import com.sunny.kit.utils.application.common.ZyUriUtil
 import com.sunny.kit.utils.application.glide.ZyImageUtil
 import com.sunny.kit.utils.domain.common.ZyDateUtilImpl
 import com.sunny.kit.utils.domain.common.ZyDensityUtilImpl
+import com.sunny.kit.utils.domain.common.ZyDevicesUtilImpl
 import com.sunny.kit.utils.domain.common.ZyEncryptionUtilImpl
 import com.sunny.kit.utils.domain.common.ZyFileUtilImpl
 import com.sunny.kit.utils.domain.common.ZyGsonUtilImpl
@@ -162,6 +164,9 @@ object ZyKit {
         ZyToastUtilImpl()
     }
 
+    val devices: ZyDevicesUtil by lazy {
+        ZyDevicesUtilImpl()
+    }
 
     /**
      * Gson
@@ -169,7 +174,6 @@ object ZyKit {
     val gson: Gson by lazy {
         ZyGsonUtilImpl().getGson()
     }
-
 
     /**
      * 初始化

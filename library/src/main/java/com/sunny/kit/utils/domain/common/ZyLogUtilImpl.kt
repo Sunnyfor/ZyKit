@@ -38,9 +38,9 @@ internal class ZyLogUtilImpl : ZyLogUtil {
     private var verticalLine = "│ "
     private var horizontalLine = "─"
 
-    private var titleStart = "\uD83D\uDD25"
+    private var titleStart = "【"
 
-    private var titleEnd = "\uD83D\uDD25"
+    private var titleEnd = "】"
 
     private val scope by lazy { CoroutineScope(IO) }
 
@@ -153,9 +153,10 @@ internal class ZyLogUtilImpl : ZyLogUtil {
     private suspend fun printTitle(logType: Int, title: String, subTitle: String) {
         val sb = StringBuilder(verticalLine)
         if (title.isNotEmpty()) {
-            sb.append("$titleStart $title $titleEnd").append("  ")
+            sb.append("$titleStart$title$titleEnd")
         }
         if (subTitle.isNotEmpty()) {
+            sb.append("  ")
             sb.append(subTitle)
         }
         log(logType, sb.toString())
@@ -170,13 +171,13 @@ internal class ZyLogUtilImpl : ZyLogUtil {
     }
 
     private suspend fun printContent(logType: Int, content: String?) {
-        if (content == null) {
-            return
+        var str = content
+        if (str == null) {
+            str = "null"
         }
-
         var msgLength = 0
         val msgSb = StringBuilder(verticalLine)
-        content.forEach { char ->
+        str.forEach { char ->
             if (char.code == 10) {  // '\n' (newline character)
                 log(logType, msgSb.toString())
                 msgSb.clear()
@@ -194,7 +195,7 @@ internal class ZyLogUtilImpl : ZyLogUtil {
                 msgLength += charLength
             }
         }
-        if (msgSb.length > verticalLine.length) {
+        if (msgSb.length >= verticalLine.length) {
             log(logType, msgSb.toString())
         }
     }
