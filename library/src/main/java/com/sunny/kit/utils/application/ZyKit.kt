@@ -19,6 +19,7 @@ import com.sunny.kit.utils.application.common.ZyStringUtl
 import com.sunny.kit.utils.application.common.ZyToastUtil
 import com.sunny.kit.utils.application.common.ZyUriUtil
 import com.sunny.kit.utils.application.glide.ZyImageUtil
+import com.sunny.kit.utils.application.http.ZyHttp
 import com.sunny.kit.utils.domain.common.ZyDateUtilImpl
 import com.sunny.kit.utils.domain.common.ZyDensityUtilImpl
 import com.sunny.kit.utils.domain.common.ZyDevicesUtilImpl
@@ -33,6 +34,7 @@ import com.sunny.kit.utils.domain.common.ZyStringUtlImpl
 import com.sunny.kit.utils.domain.common.ZyToastUtilImpl
 import com.sunny.kit.utils.domain.common.ZyUriUtilImpl
 import com.sunny.kit.utils.domain.glide.ZyGlideImageUtilImpl
+import com.sunny.kit.utils.domain.http.ZyHttpImpl
 
 /**
  * Desc 工具类初始化
@@ -173,6 +175,13 @@ object ZyKit {
      */
     val gson: Gson by lazy {
         ZyGsonUtilImpl().getGson()
+    }
+
+    /**
+     * 网络请求
+     */
+    val http: ZyHttp by lazy {
+        ZyHttpImpl()
     }
 
     /**

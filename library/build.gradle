@@ -39,8 +39,11 @@ dependencies {
     kapt project.ext.dependencies.glideCompiler
 
     implementation project.ext.dependencies.okhttp
+    //Kotlin协程库
+    implementation project.ext.dependencies.coroutines
     implementation project.ext.dependencies.coreKtx
     implementation project.ext.dependencies.appcompat
+    implementation 'androidx.documentfile:documentfile:1.0.1'
 }
 
 afterEvaluate {
