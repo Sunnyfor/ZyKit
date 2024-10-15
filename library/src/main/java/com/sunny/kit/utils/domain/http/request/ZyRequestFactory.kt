@@ -11,7 +11,6 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONObject
 import java.io.File
 
 /**
@@ -22,8 +21,6 @@ import java.io.File
  */
 internal object ZyRequestFactory {
 
-    val formParamsTag = Map::class.java
-    val jsonParamsTag = JSONObject::class.java
     private fun getUrlSb(url: String) = StringBuilder().apply {
         if (!url.contains("://")) {
             append(ZyHttpConfig.HOST)
@@ -42,7 +39,7 @@ internal object ZyRequestFactory {
         if (paramsStr.isNotEmpty()) {
             urlSb.append("?").append(paramsStr)
         }
-        return Request.Builder().url(urlSb.toString()).tag(formParamsTag, params).build()
+        return Request.Builder().url(urlSb.toString()).tag(paramsStr).build()
     }
 
     /**
@@ -54,7 +51,7 @@ internal object ZyRequestFactory {
         if (paramsStr.isNotEmpty()) {
             urlSb.append("?").append(paramsStr)
         }
-        return Request.Builder().url(urlSb.toString()).head().tag(formParamsTag, params).build()
+        return Request.Builder().url(urlSb.toString()).head().tag(paramsStr).build()
     }
 
 
@@ -64,7 +61,7 @@ internal object ZyRequestFactory {
     fun postJsonRequest(url: String, json: String): Request {
         val urlSb = getUrlSb(url)
         val body = paramsToJsonBody(json)
-        return Request.Builder().url(urlSb.toString()).post(body).tag(jsonParamsTag, JSONObject(json)).build()
+        return Request.Builder().url(urlSb.toString()).post(body).tag(json).build()
     }
 
 
@@ -73,8 +70,9 @@ internal object ZyRequestFactory {
      */
     fun postFormRequest(url: String, params: Map<String, String>): Request {
         val urlSb = getUrlSb(url)
+        val paramsStr = paramsToString(params)
         val formBody = paramsToFormBody(params)
-        return Request.Builder().url(urlSb.toString()).post(formBody).tag(formParamsTag, params).build()
+        return Request.Builder().url(urlSb.toString()).post(formBody).tag(paramsStr).build()
     }
 
 
@@ -83,8 +81,9 @@ internal object ZyRequestFactory {
      */
     fun putFormRequest(url: String, params: Map<String, String>): Request {
         val urlSb = getUrlSb(url)
+        val paramsStr = paramsToString(params)
         val formBody = paramsToFormBody(params)
-        return Request.Builder().url(urlSb.toString()).put(formBody).tag(formParamsTag, params).build()
+        return Request.Builder().url(urlSb.toString()).put(formBody).tag(paramsStr).build()
     }
 
     /**
@@ -93,7 +92,7 @@ internal object ZyRequestFactory {
     fun putJsonRequest(url: String, json: String): Request {
         val urlSb = getUrlSb(url)
         val body = paramsToJsonBody(json)
-        return Request.Builder().url(urlSb.toString()).put(body).tag(jsonParamsTag, JSONObject(json)).build()
+        return Request.Builder().url(urlSb.toString()).put(body).tag(json).build()
     }
 
 
@@ -102,8 +101,9 @@ internal object ZyRequestFactory {
      */
     fun patchFormRequest(url: String, params: Map<String, String>): Request {
         val urlSb = getUrlSb(url)
+        val paramsStr = paramsToString(params)
         val body = paramsToFormBody(params)
-        return Request.Builder().url(urlSb.toString()).patch(body).tag(formParamsTag, params).build()
+        return Request.Builder().url(urlSb.toString()).patch(body).tag(paramsStr).build()
     }
 
     /**
@@ -112,7 +112,7 @@ internal object ZyRequestFactory {
     fun patchJsonRequest(url: String, json: String): Request {
         val urlSb = getUrlSb(url)
         val body = paramsToJsonBody(json)
-        return Request.Builder().url(urlSb.toString()).patch(body).tag(jsonParamsTag, JSONObject(json)).build()
+        return Request.Builder().url(urlSb.toString()).patch(body).tag(json).build()
     }
 
 
@@ -121,8 +121,9 @@ internal object ZyRequestFactory {
      */
     fun deleteFormRequest(url: String, params: Map<String, String>): Request {
         val urlSb = getUrlSb(url)
+        val paramsStr = paramsToString(params)
         val body = paramsToFormBody(params)
-        return Request.Builder().url(urlSb.toString()).delete(body).tag(formParamsTag, params).build()
+        return Request.Builder().url(urlSb.toString()).delete(body).tag(paramsStr).build()
     }
 
     /**
@@ -131,7 +132,7 @@ internal object ZyRequestFactory {
     fun deleteJsonRequest(url: String, json: String): Request {
         val urlSb = getUrlSb(url)
         val body = paramsToJsonBody(json)
-        return Request.Builder().url(urlSb.toString()).delete(body).tag(jsonParamsTag, JSONObject(json)).build()
+        return Request.Builder().url(urlSb.toString()).delete(body).tag(json).build()
     }
 
     /**
@@ -139,6 +140,7 @@ internal object ZyRequestFactory {
      */
     fun formUploadRequest(url: String, params: Map<String, Any>): Request {
         val urlSb = getUrlSb(url)
+        val paramsStr = paramsToString(params)
         val body = MultipartBody.Builder()
         body.setType(MultipartBody.FORM)
         params.entries.forEach { entry ->
@@ -153,7 +155,7 @@ internal object ZyRequestFactory {
             }
         }
 
-        return Request.Builder().url(urlSb.toString()).post(body.build()).tag(formParamsTag, params).build()
+        return Request.Builder().url(urlSb.toString()).post(body.build()).tag(paramsStr).build()
     }
 
     /**
@@ -189,7 +191,7 @@ internal object ZyRequestFactory {
     /**
      * 将参数转换为FormBody
      */
-    private fun paramsToJsonBody(json:String): RequestBody {
+    private fun paramsToJsonBody(json: String): RequestBody {
         return json.toRequestBody("application/json; charset=utf-8".toMediaType())
     }
 
