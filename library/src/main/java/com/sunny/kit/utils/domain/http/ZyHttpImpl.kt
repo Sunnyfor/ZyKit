@@ -182,17 +182,18 @@ internal class ZyHttpImpl : ZyHttp {
             httpResultBean.url = Uri.decode(request.url.toString())
             val newRequest = request.newBuilder().tag(BaseHttpResultBean::class.java, httpResultBean).build()
             //执行异步网络请求
-            if (httpResultBean is DownLoadResultBean) {
-                httpExecute.executeDownload(newRequest, httpResultBean)
-                return
-            }
-            if (httpResultBean is HttpResultBean<*>) {
-                httpExecute.executeHttp(request, httpResultBean)
-                return
-            }
+            when (httpResultBean) {
+                is DownLoadResultBean -> {
+                    httpExecute.executeDownload(newRequest, httpResultBean)
+                }
 
-            if (httpResultBean is WebSocketResultBean){
-                httpExecute.executeWebSocket(newRequest,httpResultBean)
+                is HttpResultBean<*> -> {
+                    httpExecute.executeHttp(request, httpResultBean)
+                }
+
+                is WebSocketResultBean -> {
+                    httpExecute.executeWebSocket(newRequest, httpResultBean)
+                }
             }
         } catch (e: Exception) {
             //出现异常获取异常信息
@@ -200,7 +201,6 @@ internal class ZyHttpImpl : ZyHttp {
             httpResultBean.message = e.message ?: ""
             ZyKit.log.e("发生异常->:$httpResultBean")
         }
-
         withContext(Dispatchers.Main) {
             ZyHttpConfig.httpResultCallback.invoke(httpResultBean)
         }
